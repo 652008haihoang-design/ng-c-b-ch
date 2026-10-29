@@ -1,0 +1,609 @@
+# ng-c-b-ch
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Học Tiếng Việt Lớp 1 - Bé Ngọc Bích Xinh Gái</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts: Fredoka & Quicksand -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Fredoka', 'Quicksand', 'sans-serif'],
+                    },
+                    colors: {
+                        brandPink: '#FF6B8B',
+                        brandYellow: '#FFD93D',
+                        brandPurple: '#6C5CE7',
+                        brandGreen: '#00B894',
+                        brandBlue: '#0984E3',
+                        pastelBg: '#FFF5F7',
+                    },
+                    boxShadow: {
+                        'cartoon': '0px 6px 0px 0px rgba(0, 0, 0, 0.18)',
+                        'cartoon-lg': '0px 8px 0px 0px rgba(0, 0, 0, 0.2)',
+                        'cartoon-sm': '0px 3px 0px 0px rgba(0, 0, 0, 0.15)',
+                    },
+                    animation: {
+                        'bounce-fun': 'bounceFun 1.5s infinite',
+                        'pulse-glow': 'pulseGlow 1.5s infinite',
+                        'wiggle': 'wiggle 0.6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        bounceFun: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { filter: 'drop-shadow(0 0 8px rgba(255, 107, 139, 0.6))' },
+                            '50%': { filter: 'drop-shadow(0 0 18px rgba(255, 217, 61, 0.9))' },
+                        },
+                        wiggle: {
+                            '0%, 100%': { transform: 'rotate(-4deg)' },
+                            '50%': { transform: 'rotate(4deg)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Fredoka', 'Quicksand', sans-serif;
+            background: #FFF5F7;
+            background-image: radial-gradient(#FFB6C1 1.5px, transparent 1.5px), radial-gradient(#FFB6C1 1.5px, #FFF5F7 1.5px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-cartoon {
+            transition: all 0.12s ease-in-out;
+        }
+        .btn-cartoon:active {
+            transform: translateY(4px) scale(0.98);
+            box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.15) !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-20 flex flex-col items-center">
+
+    <!-- Mobile-Optimized Header -->
+    <header class="w-full max-w-md px-3 pt-3 sticky top-0 z-30">
+        <div class="bg-white/95 backdrop-blur-md rounded-3xl p-3 border-4 border-brandPink shadow-cartoon flex items-center justify-between">
+            
+            <!-- Mascot & Personal Greeting -->
+            <div class="flex items-center gap-2.5" onclick="speakText('Chào Ngọc Bích xinh gái! Cùng học vui nhé!')">
+                <div class="relative">
+                    <div class="w-12 h-12 bg-pink-100 border-2 border-brandPink rounded-full flex items-center justify-center text-2xl shadow-inner animate-wiggle">
+                        👑
+                    </div>
+                    <span class="absolute -bottom-1 -right-1 text-xs">✨</span>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-brandPink leading-tight flex items-center gap-1">
+                        Ngọc Bích <span class="text-xs bg-pink-200 text-pink-700 font-extrabold px-1.5 py-0.5 rounded-full">Xinh Gái</span>
+                    </h1>
+                    <p class="text-[11px] font-semibold text-gray-500">Tiếng Việt 1 • Trang 15</p>
+                </div>
+            </div>
+
+            <!-- Star Score Board -->
+            <div class="flex items-center gap-1.5 bg-amber-100 border-2 border-amber-300 px-3 py-1.5 rounded-2xl">
+                <i class="fa-solid fa-star text-2xl text-yellow-400 animate-bounce-fun"></i>
+                <span id="star-count" class="text-2xl font-black text-amber-700">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Sticky Navigation Tabs -->
+    <nav class="w-full max-w-md px-3 mt-3 z-20">
+        <div class="bg-white rounded-2xl p-1.5 border-3 border-pink-200 shadow-cartoon flex justify-between gap-1">
+            <button id="tab-learn-btn" onclick="switchTab('learn')" 
+                class="btn-cartoon flex-1 py-2 rounded-xl text-sm font-bold flex flex-col items-center justify-center gap-0.5 bg-brandPink text-white shadow-cartoon-sm">
+                <i class="fa-solid fa-book-open text-base"></i>
+                <span>Thẻ Học</span>
+            </button>
+            <button id="tab-quiz-btn" onclick="switchTab('quiz')" 
+                class="btn-cartoon flex-1 py-2 rounded-xl text-sm font-bold flex flex-col items-center justify-center gap-0.5 text-gray-600">
+                <i class="fa-solid fa-gamepad text-base text-amber-500"></i>
+                <span>Kiểm Tra</span>
+            </button>
+            <button id="tab-match-btn" onclick="switchTab('match')" 
+                class="btn-cartoon flex-1 py-2 rounded-xl text-sm font-bold flex flex-col items-center justify-center gap-0.5 text-gray-600">
+                <i class="fa-solid fa-puzzle-piece text-base text-purple-500"></i>
+                <span>Ghép Vần</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Container (Mobile Max Width) -->
+    <main class="w-full max-w-md px-3 mt-3 flex-grow">
+
+        <!-- MODE 1: THẺ HỌC HOẠT HÌNH (FLASHCARDS) -->
+        <section id="tab-learn" class="space-y-4">
+            
+            <!-- Category 1: Âm & Dấu -->
+            <div class="bg-white rounded-3xl p-4 border-4 border-purple-200 shadow-cartoon">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="bg-purple-500 text-white text-xs font-black px-2.5 py-1 rounded-lg">PHẦN 1</span>
+                    <h2 class="text-base font-bold text-gray-800">Âm Chữ Cái & Dấu Thanh</h2>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Âm a -->
+                    <div onclick="playCardSound('Âm a - Chữ a', 'a')" class="btn-cartoon bg-pink-50 hover:bg-pink-100 border-3 border-pink-300 rounded-2xl p-3 text-center cursor-pointer shadow-cartoon-sm flex flex-col items-center">
+                        <span class="text-5xl font-black text-pink-500 my-1">a</span>
+                        <span class="text-xs font-bold text-pink-700 bg-pink-200 px-3 py-0.5 rounded-full">Chữ a</span>
+                    </div>
+
+                    <!-- Âm c -->
+                    <div onclick="playCardSound('Âm cờ - Chữ c', 'c')" class="btn-cartoon bg-blue-50 hover:bg-blue-100 border-3 border-blue-300 rounded-2xl p-3 text-center cursor-pointer shadow-cartoon-sm flex flex-col items-center">
+                        <span class="text-5xl font-black text-blue-500 my-1">c</span>
+                        <span class="text-xs font-bold text-blue-700 bg-blue-200 px-3 py-0.5 rounded-full">Chữ c</span>
+                    </div>
+
+                    <!-- Dấu hỏi -->
+                    <div onclick="playCardSound('Dấu hỏi', '̉')" class="btn-cartoon bg-amber-50 hover:bg-amber-100 border-3 border-amber-300 rounded-2xl p-3 text-center cursor-pointer shadow-cartoon-sm flex flex-col items-center">
+                        <span class="text-5xl font-black text-amber-500 my-1"> ̉ </span>
+                        <span class="text-xs font-bold text-amber-700 bg-amber-200 px-3 py-0.5 rounded-full">Dấu hỏi</span>
+                    </div>
+
+                    <!-- Dấu nặng -->
+                    <div onclick="playCardSound('Dấu nặng', '̣')" class="btn-cartoon bg-emerald-50 hover:bg-emerald-100 border-3 border-emerald-300 rounded-2xl p-3 text-center cursor-pointer shadow-cartoon-sm flex flex-col items-center">
+                        <span class="text-5xl font-black text-emerald-500 my-1"> ̣ </span>
+                        <span class="text-xs font-bold text-emerald-700 bg-emerald-200 px-3 py-0.5 rounded-full">Dấu nặng</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category 2: Từ Ứng Dụng -->
+            <div class="bg-white rounded-3xl p-4 border-4 border-pink-200 shadow-cartoon">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="bg-brandPink text-white text-xs font-black px-2.5 py-1 rounded-lg">PHẦN 2</span>
+                    <h2 class="text-base font-bold text-gray-800">Từ Ứng Dụng Đánh Vần</h2>
+                </div>
+
+                <div class="space-y-3">
+                    <!-- Cỏ -->
+                    <div onclick="playWordCard('Cờ o co hỏi cỏ - Cây cỏ', 'cỏ')" class="btn-cartoon bg-green-50 hover:bg-green-100 border-3 border-green-300 rounded-2xl p-3.5 cursor-pointer shadow-cartoon-sm flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-4xl">🌱</span>
+                            <div class="text-left">
+                                <div class="text-2xl font-black text-green-700">cỏ</div>
+                                <div class="text-xs font-semibold text-green-600">c - o - hỏi - cỏ</div>
+                            </div>
+                        </div>
+                        <button class="w-9 h-9 bg-green-400 text-white rounded-xl shadow-cartoon-sm flex items-center justify-center">
+                            <i class="fa-solid fa-volume-high text-sm"></i>
+                        </button>
+                    </div>
+
+                    <!-- Cọ -->
+                    <div onclick="playWordCard('Cờ o co nặng cọ - Cây cọ', 'cọ')" class="btn-cartoon bg-orange-50 hover:bg-orange-100 border-3 border-orange-300 rounded-2xl p-3.5 cursor-pointer shadow-cartoon-sm flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-4xl">🌴</span>
+                            <div class="text-left">
+                                <div class="text-2xl font-black text-orange-700">cọ</div>
+                                <div class="text-xs font-semibold text-orange-600">c - o - nặng - cọ</div>
+                            </div>
+                        </div>
+                        <button class="w-9 h-9 bg-orange-400 text-white rounded-xl shadow-cartoon-sm flex items-center justify-center">
+                            <i class="fa-solid fa-volume-high text-sm"></i>
+                        </button>
+                    </div>
+
+                    <!-- Cá -->
+                    <div onclick="playWordCard('Cờ a ca sắc cá - Con cá', 'cá')" class="btn-cartoon bg-sky-50 hover:bg-sky-100 border-3 border-sky-300 rounded-2xl p-3.5 cursor-pointer shadow-cartoon-sm flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-4xl">🐟</span>
+                            <div class="text-left">
+                                <div class="text-2xl font-black text-sky-700">cá</div>
+                                <div class="text-xs font-semibold text-sky-600">c - a - sắc - cá</div>
+                            </div>
+                        </div>
+                        <button class="w-9 h-9 bg-sky-400 text-white rounded-xl shadow-cartoon-sm flex items-center justify-center">
+                            <i class="fa-solid fa-volume-high text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category 3: Giao Tiếp Lễ Phép -->
+            <div class="bg-white rounded-3xl p-4 border-4 border-yellow-200 shadow-cartoon">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="bg-amber-400 text-white text-xs font-black px-2.5 py-1 rounded-lg">PHẦN 3</span>
+                    <h2 class="text-base font-bold text-gray-800">Lời Chào Lễ Phép</h2>
+                </div>
+
+                <div onclick="playWordCard('Con chào bố ạ! Ngọc Bích xinh gái rất ngoan!', 'Chào bố')" class="btn-cartoon bg-amber-50 hover:bg-amber-100 border-3 border-amber-300 rounded-2xl p-4 cursor-pointer shadow-cartoon-sm flex items-center gap-3">
+                    <span class="text-5xl">👨‍👧</span>
+                    <div class="text-left flex-grow">
+                        <div class="text-lg font-black text-amber-800">"Con chào bố ạ!"</div>
+                        <p class="text-xs text-amber-600 font-semibold">Chạm vào để nghe đọc mẫu nhé Ngọc Bích!</p>
+                    </div>
+                    <button class="w-10 h-10 bg-amber-400 text-white rounded-xl shadow-cartoon-sm flex items-center justify-center">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- MODE 2: TRÒ CHƠI KIỂM TRA TƯƠNG TÁC -->
+        <section id="tab-quiz" class="hidden space-y-4">
+            <div class="bg-white rounded-3xl p-4 border-4 border-amber-300 shadow-cartoon text-center">
+                
+                <!-- Status & Audio Replay -->
+                <div class="flex items-center justify-between mb-3">
+                    <span id="quiz-progress" class="bg-amber-100 text-amber-800 font-black px-3 py-1 rounded-xl text-xs border border-amber-300">
+                        Câu 1 / 5
+                    </span>
+                    <button onclick="playQuizPromptSound()" class="btn-cartoon bg-amber-400 hover:bg-amber-500 text-white font-bold px-3 py-1.5 rounded-xl border-2 border-white shadow-cartoon-sm flex items-center gap-1.5 text-xs">
+                        <i class="fa-solid fa-volume-high"></i> Nghe lại câu hỏi
+                    </button>
+                </div>
+
+                <!-- Cartoon Quiz Mascot -->
+                <div class="my-4 flex flex-col items-center">
+                    <div class="w-16 h-16 bg-pink-100 border-3 border-brandPink rounded-full flex items-center justify-center text-3xl shadow-cartoon animate-bounce-fun mb-2">
+                        🐰
+                    </div>
+                    <h3 id="quiz-prompt-text" class="text-lg font-black text-gray-800 px-2 leading-snug">
+                        Đang tải câu hỏi...
+                    </h3>
+                </div>
+
+                <!-- Answer Options -->
+                <div id="quiz-options-grid" class="grid grid-cols-2 gap-3 mt-4">
+                    <!-- Dynamic Answer Buttons -->
+                </div>
+
+                <!-- Result & Praise Box -->
+                <div id="quiz-feedback-box" class="mt-4 min-h-[3.5rem] flex items-center justify-center text-center font-black text-base px-2">
+                    <!-- Praise Animation Message -->
+                </div>
+
+            </div>
+        </section>
+
+        <!-- MODE 3: TRÒ CHƠI GHÉP VẦN HOẠT HÌNH -->
+        <section id="tab-match" class="hidden space-y-4">
+            <div class="bg-white rounded-3xl p-4 border-4 border-purple-300 shadow-cartoon text-center">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="bg-purple-100 text-purple-700 font-bold px-3 py-1 rounded-xl text-xs border border-purple-200">
+                        🧩 Thử Thách Ghép Thẻ
+                    </span>
+                    <button onclick="initMatchingGame()" class="btn-cartoon bg-purple-400 text-white px-3 py-1 rounded-xl text-xs font-bold shadow-cartoon-sm">
+                        🔄 Chơi Lại
+                    </button>
+                </div>
+
+                <p class="text-xs font-semibold text-gray-500 mb-4">Ngọc Bích hãy tìm 2 thẻ giống nhau hoặc đúng nghĩa để ghép đôi nhé!</p>
+
+                <!-- Matching Game Grid (4x3 = 12 cards) -->
+                <div id="match-grid" class="grid grid-cols-3 gap-2.5">
+                    <!-- Cards generated via JS -->
+                </div>
+
+                <div id="match-feedback" class="mt-4 font-black text-purple-700 text-base min-h-[2.5rem] flex items-center justify-center">
+                    <!-- Matching Feedback -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- App Sound Effects & Personalized Speech Script -->
+    <script>
+        // --- Personalized Praise List for Ngọc Bích ---
+        const praiseList = [
+            "Giỏi quá Ngọc Bích xinh gái ơi!",
+            "Ngọc Bích xinh gái xuất sắc quá!",
+            "Tuyệt vời Ngọc Bích ơi!",
+            "Chính xác rồi! Ngọc Bích thông minh quá!",
+            "Hoan hô Ngọc Bích xinh gái!"
+        ];
+
+        function getRandomPraise() {
+            return praiseList[Math.floor(Math.random() * praiseList.length)];
+        }
+
+        // --- Web Audio API FX ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSuccessSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+            osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.35); // A5
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.35);
+        }
+
+        function playWrongSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(240, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        // --- Speech Synthesis ---
+        function speakText(text, onEndCallback = null) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'vi-VN';
+                utterance.rate = 0.85; // Slow & friendly for kid
+                utterance.pitch = 1.15;
+                if (onEndCallback) {
+                    utterance.onend = onEndCallback;
+                }
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // --- Tab Switching ---
+        let stars = 0;
+        function switchTab(tab) {
+            document.getElementById('tab-learn').classList.add('hidden');
+            document.getElementById('tab-quiz').classList.add('hidden');
+            document.getElementById('tab-match').classList.add('hidden');
+
+            const btnLearn = document.getElementById('tab-learn-btn');
+            const btnQuiz = document.getElementById('tab-quiz-btn');
+            const btnMatch = document.getElementById('tab-match-btn');
+
+            btnLearn.className = "btn-cartoon flex-1 py-2 rounded-xl text-sm font-bold flex flex-col items-center justify-center gap-0.5 text-gray-600";
+            btnQuiz.className = "btn-cartoon flex-1 py-2 rounded-xl text-sm font-bold flex flex-col items-center justify-center gap-0.5 text-gray-600";
+            btnMatch.className = "btn-cartoon flex-1 py-2 rounded-xl text-sm font-bold flex flex-col items-center justify-center gap-0.5 text-gray-600";
+
+            if (tab === 'learn') {
+                document.getElementById('tab-learn').classList.remove('hidden');
+                btnLearn.className = "btn-cartoon flex-1 py-2 rounded-xl text-sm font-bold flex flex-col items-center justify-center gap-0.5 bg-brandPink text-white shadow-cartoon-sm";
+            } else if (tab === 'quiz') {
+                document.getElementById('tab-quiz').classList.remove('hidden');
+                btnQuiz.className = "btn-cartoon flex-1 py-2 rounded-xl text-sm font-bold flex flex-col items-center justify-center gap-0.5 bg-amber-400 text-white shadow-cartoon-sm";
+                loadQuiz();
+            } else if (tab === 'match') {
+                document.getElementById('tab-match').classList.remove('hidden');
+                btnMatch.className = "btn-cartoon flex-1 py-2 rounded-xl text-sm font-bold flex flex-col items-center justify-center gap-0.5 bg-purple-500 text-white shadow-cartoon-sm";
+                initMatchingGame();
+            }
+        }
+
+        function playCardSound(desc, word) {
+            speakText(desc);
+        }
+
+        function playWordCard(spell, word) {
+            speakText(spell);
+        }
+
+        // --- Quiz Mode Data & State ---
+        let currentQuizIndex = 0;
+        const quizQuestions = [
+            {
+                prompt: "Ngọc Bích ơi, tìm giúp chữ 'cỏ' nhé!",
+                speakPrompt: "Ngọc Bích ơi, hãy tìm giúp chữ cỏ nhé!",
+                options: [
+                    { label: "🌱 cỏ", correct: true },
+                    { label: "🌴 cọ", correct: false },
+                    { label: "🐟 cá", correct: false },
+                    { label: "🅰️ a", correct: false }
+                ]
+            },
+            {
+                prompt: "Đâu là 'Dấu hỏi' vậy Ngọc Bích xinh gái?",
+                speakPrompt: "Đâu là dấu hỏi vậy Ngọc Bích xinh gái?",
+                options: [
+                    { label: "Dấu nặng ( ̣ )", correct: false },
+                    { label: "Dấu hỏi ( ̉ )", correct: true },
+                    { label: "Dấu sắc ( ́ )", correct: false },
+                    { label: "Dấu huyền ( ̀ )", correct: false }
+                ]
+            },
+            {
+                prompt: "Bấm vào chữ 'cá' cho con cá bơi nào!",
+                speakPrompt: "Ngọc Bích bấm vào chữ cá nào!",
+                options: [
+                    { label: "🌱 cỏ", correct: false },
+                    { label: "🐟 cá", correct: true },
+                    { label: "🌴 cọ", correct: false },
+                    { label: "🔤 c", correct: false }
+                ]
+            },
+            {
+                prompt: "Khi gặp người lớn, Ngọc Bích nói câu gì?",
+                speakPrompt: "Khi gặp người lớn, Ngọc Bích nói câu gì nào?",
+                options: [
+                    { label: "Con chào bố ạ!", correct: true },
+                    { label: "Không chào đâu", correct: false },
+                    { label: "Tạm biệt nhé", correct: false },
+                    { label: "Đi chơi thôi", correct: false }
+                ]
+            },
+            {
+                prompt: "Bé chọn từ 'cọ' (cây cọ) nhé!",
+                speakPrompt: "Bé chọn từ cọ nào!",
+                options: [
+                    { label: "🌱 cỏ", correct: false },
+                    { label: "🌴 cọ", correct: true },
+                    { label: "🐟 cá", correct: false },
+                    { label: "🅰️ a", correct: false }
+                ]
+            }
+        ];
+
+        function playQuizPromptSound() {
+            speakText(quizQuestions[currentQuizIndex].speakPrompt);
+        }
+
+        function loadQuiz() {
+            const q = quizQuestions[currentQuizIndex];
+            document.getElementById('quiz-progress').innerText = `Câu ${currentQuizIndex + 1} / ${quizQuestions.length}`;
+            document.getElementById('quiz-prompt-text').innerText = q.prompt;
+            document.getElementById('quiz-feedback-box').innerHTML = '';
+
+            const grid = document.getElementById('quiz-options-grid');
+            grid.innerHTML = '';
+
+            playQuizPromptSound();
+
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-cartoon bg-gradient-to-b from-amber-50 to-amber-100 hover:from-amber-100 hover:to-amber-200 border-3 border-amber-300 font-extrabold text-amber-900 py-3 px-2 rounded-2xl shadow-cartoon text-base flex items-center justify-center';
+                btn.innerText = opt.label;
+                btn.onclick = () => checkQuizAnswer(opt);
+                grid.appendChild(btn);
+            });
+        }
+
+        function checkQuizAnswer(option) {
+            const feedbackBox = document.getElementById('quiz-feedback-box');
+            if (option.correct) {
+                playSuccessSound();
+                stars += 10;
+                document.getElementById('star-count').innerText = stars;
+
+                const praiseMsg = getRandomPraise();
+                feedbackBox.innerHTML = `<span class="text-pink-600 font-black text-lg animate-bounce-fun">${praiseMsg} 🎉 +10 ⭐</span>`;
+                speakText(praiseMsg);
+
+                confetti({
+                    particleCount: 70,
+                    spread: 60,
+                    origin: { y: 0.65 }
+                });
+
+                setTimeout(() => {
+                    currentQuizIndex = (currentQuizIndex + 1) % quizQuestions.length;
+                    loadQuiz();
+                }, 2500);
+            } else {
+                playWrongSound();
+                feedbackBox.innerHTML = `<span class="text-rose-500 font-bold">Thử lại nhé Ngọc Bích xinh gái! 💖</span>`;
+                speakText("Thử chọn lại lần nữa xem nào Ngọc Bích ơi!");
+            }
+        }
+
+        // --- Mode 3: Matching Game (Flip Cards) ---
+        const matchItems = [
+            { id: 1, val: '🌱', matchId: 'cỏ' },
+            { id: 2, val: 'cỏ', matchId: 'cỏ' },
+            { id: 3, val: '🌴', matchId: 'cọ' },
+            { id: 4, val: 'cọ', matchId: 'cọ' },
+            { id: 5, val: '🐟', matchId: 'cá' },
+            { id: 6, val: 'cá', matchId: 'cá' },
+            { id: 7, val: '👨‍👧', matchId: 'chào' },
+            { id: 8, val: 'chào bố', matchId: 'chào' },
+            { id: 9, val: ' ̉ ', matchId: 'dấu hỏi' },
+            { id: 10, val: 'dấu hỏi', matchId: 'dấu hỏi' },
+            { id: 11, val: ' ̣ ', matchId: 'dấu nặng' },
+            { id: 12, val: 'dấu nặng', matchId: 'dấu nặng' },
+        ];
+
+        let flippedCards = [];
+        let matchedPairs = 0;
+
+        function initMatchingGame() {
+            matchedPairs = 0;
+            flippedCards = [];
+            document.getElementById('match-feedback').innerText = '';
+            const grid = document.getElementById('match-grid');
+            grid.innerHTML = '';
+
+            // Shuffle array
+            const shuffled = [...matchItems].sort(() => Math.random() - 0.5);
+
+            shuffled.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'btn-cartoon bg-purple-100 border-3 border-purple-300 rounded-2xl h-20 flex items-center justify-center cursor-pointer shadow-cartoon-sm text-2xl font-black text-purple-800';
+                card.dataset.matchId = item.matchId;
+                card.dataset.val = item.val;
+                card.innerText = '❓';
+                card.onclick = () => handleCardFlip(card);
+                grid.appendChild(card);
+            });
+        }
+
+        function handleCardFlip(card) {
+            if (flippedCards.length >= 2 || card.classList.contains('matched') || flippedCards.includes(card)) {
+                return;
+            }
+
+            card.innerText = card.dataset.val;
+            card.classList.remove('bg-purple-100');
+            card.classList.add('bg-yellow-100', 'border-yellow-400');
+            speakText(card.dataset.val);
+
+            flippedCards.push(card);
+
+            if (flippedCards.length === 2) {
+                const [card1, card2] = flippedCards;
+                if (card1.dataset.matchId === card2.dataset.matchId) {
+                    // Match success
+                    playSuccessSound();
+                    card1.classList.add('matched', 'bg-green-100', 'border-green-400');
+                    card2.classList.add('matched', 'bg-green-100', 'border-green-400');
+                    flippedCards = [];
+                    matchedPairs++;
+
+                    const praise = getRandomPraise();
+                    document.getElementById('match-feedback').innerText = praise;
+                    speakText(praise);
+
+                    if (matchedPairs === matchItems.length / 2) {
+                        stars += 20;
+                        document.getElementById('star-count').innerText = stars;
+                        confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
+                        document.getElementById('match-feedback').innerText = "🏆 Ngọc Bích hoàn thành xuất sắc! +20 ⭐";
+                        speakText("Tuyệt vời! Ngọc Bích xinh gái đã ghép đúng tất cả các thẻ!");
+                    }
+                } else {
+                    // Match failed
+                    playWrongSound();
+                    setTimeout(() => {
+                        card1.innerText = '❓';
+                        card2.innerText = '❓';
+                        card1.className = 'btn-cartoon bg-purple-100 border-3 border-purple-300 rounded-2xl h-20 flex items-center justify-center cursor-pointer shadow-cartoon-sm text-2xl font-black text-purple-800';
+                        card2.className = 'btn-cartoon bg-purple-100 border-3 border-purple-300 rounded-2xl h-20 flex items-center justify-center cursor-pointer shadow-cartoon-sm text-2xl font-black text-purple-800';
+                        flippedCards = [];
+                    }, 1000);
+                }
+            }
+        }
+
+        // Launch app
+        window.onload = function() {
+            switchTab('learn');
+        };
+    </script>
+</body>
+</html>
